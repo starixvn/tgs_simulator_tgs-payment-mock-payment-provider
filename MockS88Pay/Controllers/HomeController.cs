@@ -18,10 +18,10 @@ namespace MockS88Pay.Controllers
         {
             var apiKey = configuration.GetValue<string>("Crypto:apiKey");
             var secretKey = configuration.GetValue<string>("Crypto:secretKey");
-            var decryptString = await getDecryptData(cryptor, apiKey, secretKey);
+            var decryptString = await GetDecryptData(cryptor, apiKey, secretKey);
             logger.LogInformation("Request Body: {decryptString}", decryptString);
 
-            var dict = parseDecryptString(decryptString);
+            var dict = ParseDecryptString(decryptString);
             dict["transaction_actual_amount"] = dict["transaction_amount"];
             dict["transaction_no"] = "9888";
             dict["transaction_status"] = "2";
@@ -51,7 +51,7 @@ namespace MockS88Pay.Controllers
             });
         }
 
-        private async Task<string> getDecryptData(S88PayCryptor cryptor, string? apiKey, string? secretKey)
+        private async Task<string> GetDecryptData(S88PayCryptor cryptor, string? apiKey, string? secretKey)
         {
             using var reader = new StreamReader(Request.Body);
             var body = await reader.ReadToEndAsync();
@@ -62,7 +62,7 @@ namespace MockS88Pay.Controllers
             return decryptString;
         }
 
-        private Dictionary<string, string> parseDecryptString(string decryptString)
+        private Dictionary<string, string> ParseDecryptString(string decryptString)
         {
             var decryptArray = decryptString.Split("&");
             var dict = new Dictionary<string, string>();
@@ -101,11 +101,11 @@ namespace MockS88Pay.Controllers
         {
             var apiKey = configuration.GetValue<string>("Crypto:apiKey");
             var secretKey = configuration.GetValue<string>("Crypto:secretKey");
-            var decryptString = await getDecryptData(cryptor, apiKey, secretKey);
+            var decryptString = await GetDecryptData(cryptor, apiKey, secretKey);
             logger.LogInformation("Request Body: {decryptString}", decryptString);
 
-            var dict = parseDecryptString(decryptString);
-            _ = NotifyWithdrawedAsync(cryptor, dict, apiKey!, secretKey!);
+            var dict = JsonSerializer.Deserialize<Dictionary<string, string>>(decryptString);
+            _ = NotifyWithdrawedAsync(cryptor, dict!, apiKey!, secretKey!);
             return Results.Json(new { success = true });
         }
 
@@ -145,10 +145,10 @@ namespace MockS88Pay.Controllers
         {
             var apiKey = configuration.GetValue<string>("Crypto:apiKey");
             var secretKey = configuration.GetValue<string>("Crypto:secretKey");
-            var decryptString = await getDecryptData(cryptor, apiKey, secretKey);
+            var decryptString = await GetDecryptData(cryptor, apiKey, secretKey);
             logger.LogInformation("Request Body: {decryptString}", decryptString);
 
-            var dict = parseDecryptString(decryptString);
+            var dict = ParseDecryptString(decryptString);
             dict["transaction_no"] = "123aa";
             dict["traction_status"] = "true";
             dict["type"] = "quite good";
