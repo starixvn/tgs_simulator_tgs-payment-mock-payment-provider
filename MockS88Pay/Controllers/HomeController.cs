@@ -150,7 +150,7 @@ namespace MockS88Pay.Controllers
 
             var dict = ParseDecryptString(decryptString);
             dict["transaction_no"] = "123aa";
-            dict["traction_status"] = "true";
+            dict["status"] = "2";
             dict["type"] = "quite good";
             var transactionData = new List<Dictionary<string, string>> { dict };
 
