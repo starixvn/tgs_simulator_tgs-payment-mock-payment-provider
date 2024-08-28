@@ -13,11 +13,11 @@ namespace MockPaymentProvider.Controllers
             var raw = await Request.ReadFormAsync();
             logger.LogInformation("Request from U2Pay CreateOrder: {raw}", raw.ToString());
 
-            var result = new
+            var result = new 
             {
-                code = "123",
-                amount = raw["amount"]!,
-                orderNo = raw["orderNo"]!,
+                code = 0,
+                amount = long.Parse(raw["amount"]!.ToString()),
+                orderNo = raw["orderNo"]!.ToString(),
                 tradeNo = "123",
                 targetUrl = "https://www.google.com/",
             };
@@ -61,9 +61,9 @@ namespace MockPaymentProvider.Controllers
 
             var result = new
             {
-                code = "999",
-                amount = raw["amount"]!,
-                orderNo = raw["orderNo"]!,
+                code = 0,
+                amount = long.Parse(raw["amount"]!.ToString()),
+                orderNo = raw["orderNo"]!.ToString(),
                 tradeNo = "123",
             };
 
