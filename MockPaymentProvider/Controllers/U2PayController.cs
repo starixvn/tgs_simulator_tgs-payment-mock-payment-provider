@@ -4,7 +4,7 @@ using Microsoft.Extensions.Primitives;
 namespace MockPaymentProvider.Controllers
 {
     [ApiController]
-    [Route("[controller]/api")]
+    [Route("[controller]")]
     public class U2PayController(ILogger<U2PayController> logger, HttpClient httpClient): ControllerBase
     {
         [HttpPost("order/create")]
