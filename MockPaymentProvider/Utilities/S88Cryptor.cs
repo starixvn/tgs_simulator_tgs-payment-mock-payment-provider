@@ -1,7 +1,7 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
 
-namespace MockS88Pay.Utilities
+namespace MockPaymentProvider.Utilities
 {
     public class S88PayCryptor(ILogger<S88PayCryptor> logger)
     {

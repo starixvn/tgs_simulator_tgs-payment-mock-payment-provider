@@ -1,4 +1,4 @@
-using MockS88Pay.Utilities;
+using MockPaymentProvider.Utilities;
 
 var builder = WebApplication.CreateBuilder(args);
 

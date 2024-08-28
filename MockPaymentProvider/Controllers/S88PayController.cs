@@ -1,16 +1,13 @@
-using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.AspNetCore.Mvc;
-using MockS88Pay.Utilities;
+using MockPaymentProvider.Utilities;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using System.Text.Json.Serialization;
-using System.Transactions;
 
-namespace MockS88Pay.Controllers
+namespace MockPaymentProvider.Controllers
 {
     [ApiController]
-    [Route("api")]
-    public class HomeController(ILogger<HomeController> logger, IConfiguration configuration) : ControllerBase
+    [Route("[controller]/api")]
+    public class S88PayController(ILogger<S88PayController> logger, IConfiguration configuration) : ControllerBase
     {
 
         [HttpPost("{merchantCode}/v3/dopayment")]
