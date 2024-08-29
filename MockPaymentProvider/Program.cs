@@ -6,6 +6,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<S88PayCryptor>();
+builder.Services.AddSingleton<U2PayHasher>();
 builder.Services.AddHttpClient();
 builder.Services.AddHealthChecks();
 

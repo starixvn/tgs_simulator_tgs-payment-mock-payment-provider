@@ -1,17 +1,18 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
+using MockPaymentProvider.Utilities;
 
 namespace MockPaymentProvider.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class U2PayController(ILogger<U2PayController> logger, HttpClient httpClient): ControllerBase
+    public class U2PayController(ILogger<U2PayController> logger, IConfiguration configuration, U2PayHasher hasher): ControllerBase
     {
         [HttpPost("order/create")]
         public async Task<IResult> CreateOrderAsync()
         {
             var raw = await Request.ReadFormAsync();
-            logger.LogInformation("Request from U2Pay CreateOrder: {raw}", raw.ToString());
+            logger.LogInformation("Request from U2Pay CreateOrder: {raw}", raw);
 
             var result = new 
             {
@@ -34,21 +35,33 @@ namespace MockPaymentProvider.Controllers
                 ["discount"] = "0",
                 ["lucky"] = "0",
                 ["paid"] = raw["amount"]!,
-                ["extra"] = "no extra",
-                ["sign"] = raw["sign"]!
+                ["extra"] = "no extra"
             };
+
+            var excludeKeys = new string[] { "userName", "channelNo" };
+
+            
+            request["sign"] = ComputHash(excludeKeys, request);
 
             _ = CallBack(raw["notifyUrl"]!, request);
 
             return Results.Json(result);
         }
 
+        private string ComputHash(string[] excludeKeys, Dictionary<string, string> dict)
+        => hasher.ComputeHash(configuration.GetValue<string>("U2Pay:privateKey")!, dict.Where(x => !excludeKeys.Contains(x.Key))!);
+
         private async Task CallBack(string url, Dictionary<string,string> data)
         {
+            logger.LogInformation("Waiting to callback...{url}", url);
             await Task.Delay(30000);
             var request = new FormUrlEncodedContent(data);
-            logger.LogInformation("NotifyDeposited Request: {data}", data);
-            var response = await httpClient.PostAsync(new Uri(url), request);
+            logger.LogInformation("Notify Request: {data}", data);
+            var _httpClient = new HttpClient
+            {
+                BaseAddress = new Uri(url)
+            };
+            var response = await _httpClient.PostAsync(new Uri(url), request);
             logger.LogInformation("Received: {response}", response);
 
         }
@@ -57,12 +70,12 @@ namespace MockPaymentProvider.Controllers
         public async Task<IResult> CreatePayoutAsync()
         {
             var raw = await Request.ReadFormAsync();
-            logger.LogInformation("Request from U2Pay CreatePayout: {raw}", raw.ToString());
+            logger.LogInformation("Request from U2Pay CreatePayout: {raw}", raw);
 
             var result = new
             {
                 code = 0,
-                amount = long.Parse(raw["amount"]!.ToString()),
+                amount = decimal.Parse(raw["amount"]!.ToString()),
                 orderNo = raw["orderNo"]!.ToString(),
                 tradeNo = "123",
             };
@@ -74,17 +87,19 @@ namespace MockPaymentProvider.Controllers
                 ["orderNo"] = raw["orderNo"]!,
                 ["name"] = "eliastestu2pay",
                 ["bankName"]= "eliastestu2pay1",
-                ["bankAccount"]="",
-                ["bankBranch"]="",
-                ["memo"]="",
-                ["mobile"]="",
-                ["fee"]="",
+                ["bankAccount"] ="test",
+                ["bankBranch"]="TPHCM-1",
+                ["memo"]="memo01",
+                ["mobile"]="023",
+                ["fee"]="0",
                 ["amount"] = raw["amount"]!,
-                ["paid"] = raw["amount"]!,
                 ["extra"] = "no extra",
-                ["sign"] = raw["sign"]!,
-                ["reason"] = "",
+                ["reason"] = "hello",
             };
+
+            var excludeKeys = new string[] { "bankBranch", "memo", "reason" };
+
+            request["sign"] = ComputHash(excludeKeys, request);
 
             _ = CallBack(raw["notifyUrl"]!, request);
 
