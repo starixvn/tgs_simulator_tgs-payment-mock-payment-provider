@@ -6,7 +6,7 @@ namespace MockPaymentProvider.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class U2PayController(ILogger<U2PayController> logger, IConfiguration configuration, U2PayHasher hasher): ControllerBase
+    public class U2PayController(ILogger<U2PayController> logger, IConfiguration configuration, U2PayHasher hasher): Controller
     {
         [HttpPost("order/create")]
         public async Task<IResult> CreateOrderAsync()
@@ -20,7 +20,7 @@ namespace MockPaymentProvider.Controllers
                 amount = long.Parse(raw["amount"]!.ToString()),
                 orderNo = raw["orderNo"]!.ToString(),
                 tradeNo = "123",
-                targetUrl = "https://www.google.com/",
+                targetUrl = "https://mock-payment-provider.nexentgame.com/u2pay/example",
             };
 
             var request = new Dictionary<string, string>
@@ -104,6 +104,12 @@ namespace MockPaymentProvider.Controllers
             _ = CallBack(raw["notifyUrl"]!, request);
 
             return Results.Json(result);
+        }
+
+        [HttpGet("example")]
+        public IActionResult ShowExample()
+        {
+            return View("~/Views/Index.cshtml");
         }
     }
 }
